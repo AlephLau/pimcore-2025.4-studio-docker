@@ -1,67 +1,186 @@
-# Pimcore Project Skeleton 
+# Pimcore 2025.4 + Studio UI (Docker, ready-to-use)
 
-This skeleton should be used by experienced Pimcore developers for starting a new project from the ground up. 
-If you are new to Pimcore, it's better to start with our demo package, listed below 😉
+This repository provides a **fully working Pimcore 2025.4 local development environment** with the **new Pimcore Studio (Backend + UI)** already configured.
 
-## Getting started
+The goal of this project is simple:
+
+> **Clone → Docker up → Run a few commands → Start working with Pimcore Studio**
+
+This repo exists because, as of Pimcore **2025.4**, installing the new Studio stack requires combining multiple pieces of documentation with no clear step-by-step path:
+- Platform Version
+- Generic Execution Engine
+- Generic Data Index
+- OpenSearch
+- Mercure
+- Studio Backend
+- Studio UI
+- New parameters on config.yaml
+- Messenger + Supervisor configuration
+
+All that work is already done here.
+
+---
+
+## ⚠️ Important Notes
+
+- **Development only** – not production-ready.
+- **Not affiliated with or endorsed by Pimcore GmbH.**
+
+---
+
+## 📋 Requirements
+
+- Docker Engine
+- Docker Compose
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the repository
 ```bash
-COMPOSER_MEMORY_LIMIT=-1 composer create-project pimcore/skeleton my-project
-cd ./my-project
-./vendor/bin/pimcore-install
+git clone https://github.com/AlephLau/pimcore-2025.4-studio-docker.git
+cd pimcore-2025.4-studio-docker
 ```
 
-- Point your virtual host to `my-project/public`
-- [Only for Apache] Create `my-project/public/.htaccess` according to https://pimcore.com/docs/platform/Pimcore/Installation_and_Upgrade/System_Setup_and_Hosting/Apache_Configuration/ 
-- Open https://your-host/admin in your browser
-- Done! 😎
+---
 
-## Docker
+### 2. Start containers
+```bash
+docker compose up -d
+```
 
-You can also use Docker to set up a new Pimcore Installation.
-You don't need to have a PHP environment with composer installed.
+---
 
-### Prerequisites
+### 3. Prepare Pimcore directories
+```bash
+docker compose exec php mkdir -p var/tmp var/cache var/log
+docker compose exec php chmod -R 777 var/
+```
 
-* Your user must be allowed to run docker commands (directly or via sudo).
-* You must have docker compose installed.
-* Your user must be allowed to change file permissions (directly or via sudo).
+---
 
-### Follow these steps
-1. Initialize the skeleton project using the `pimcore/pimcore` image
-``docker run -u `id -u`:`id -g` --rm -v `pwd`:/var/www/html pimcore/pimcore:php8.3-latest composer create-project pimcore/skeleton my-project``
+### 4. Install PHP dependencies
+```bash
+docker compose exec php composer install --no-scripts
+```
 
-2. Go to your new project
-`cd my-project/`
+---
 
-3. Part of the new project is a docker compose file
-    * Run `sed -i "s|#user: '1000:1000'|user: '$(id -u):$(id -g)'|g" docker-compose.yaml` to set the correct user id and group id.
-    * Start the needed services with `docker compose up -d`
+### 5. Install Pimcore (interactive)
+```bash
+docker compose exec php vendor/bin/pimcore-install
+```
+- Enter admin username (e.g., `admin`)
+- Enter admin password
+- Open the registration link provided, get your product key
+- Paste the product key
 
-4. Install pimcore and initialize the DB
-    `docker compose exec php vendor/bin/pimcore-install`
-    * When asked for admin user and password: Choose freely
-    * This can take a while, up to 20 minutes
-    * If you select to install the SimpleBackendSearchBundle please make sure to add the `pimcore_search_backend_message` to your `.docker/supervisord.conf` file inside value for 'command' like `pimcore_maintenance` already is.
+---
 
-5. Run codeception tests:
-   * `docker compose run --user=root --rm test-php chown -R $(id -u):$(id -g) var/ public/var/`
-   * `docker compose run --rm test-php vendor/bin/pimcore-install -n`
-   * `docker compose run --rm test-php vendor/bin/codecept run -vv`
+### 6. Install required bundles
+```bash
+docker compose exec php bin/console pimcore:bundle:install PimcoreGenericExecutionEngineBundle
+docker compose exec php bin/console pimcore:bundle:install PimcoreGenericDataIndexBundle
+docker compose exec php bin/console pimcore:bundle:install PimcoreStudioBackendBundle
+docker compose exec php bin/console pimcore:bundle:install PimcoreStudioUiBundle
+```
 
-6. :heavy_check_mark: DONE - You can now visit your pimcore instance:
-    * The frontend: <http://localhost>
-    * The admin interface, using the credentials you have chosen above:
-      <http://localhost/admin>
+---
 
-## Pimcore Platform Version
-By default, Pimcore Platform Version is added as a dependency which ensures installation of compatible and in combination 
-with each other tested versions of additional Pimcore modules. More information about the Platform Version can be found in the 
-[Platform Version docs](https://github.com/pimcore/platform-version). 
+### 7. Build OpenSearch indexes
+```bash
+docker compose exec php bin/console generic-data-index:update:index -r
+```
 
-It might be necessary to update a specific Pimcore module to a version that is not included in the Platform Version.
-In that case, you need to remove the `platform-version` dependency from your `composer.json` and update the module to
-the desired version.
-Be aware that this might lead to a theoretically compatible but untested combination of Pimcore modules.
+---
 
-## Other demo/skeleton packages
-- [Pimcore Basic Demo](https://github.com/pimcore/demo)
+## ✅ Done!
+
+### Access URLs
+
+| URL | Description |
+|-----|-------------|
+| http://localhost:8000/admin | Classic Admin UI |
+| http://localhost:8000/pimcore-studio | **New Studio UI** |
+| http://localhost:8000/pimcore-studio/api/docs | API Documentation (Swagger) |
+
+---
+
+## 🧱 Architecture Overview
+
+| Component | Purpose |
+|-----------|---------|
+| **RabbitMQ** | Message queue for background jobs (imports, exports, etc.) |
+| **Supervisor** | Manages Messenger workers that process queues |
+| **OpenSearch** | Search engine for Generic Data Index (fast asset/object search) |
+| **Mercure** | Server-Sent Events for real-time Studio updates |
+| **Studio Backend** | REST API with OpenAPI documentation |
+| **Studio UI** | Modern React-based admin interface |
+
+---
+
+## 🧠 For Existing Pimcore Projects
+
+Each architectural step is isolated into **separate commits** so you can inspect and adapt them to your own project:
+
+```bash
+git log --oneline
+```
+
+| Commit | Description |
+|--------|-------------|
+| 1 | Initial Pimcore skeleton |
+| 2 | Platform Version 2025.4 setup |
+| 3 | Generic Execution Engine + RabbitMQ + Supervisor |
+| 4 | Generic Data Index + OpenSearch |
+| 5 | Mercure + Nginx reverse proxy |
+| 6 | Studio Backend Bundle + Security firewall |
+| 7 | Studio UI Bundle |
+
+Review each commit to see exactly which files were modified.
+
+---
+
+## 🔧 Troubleshooting
+
+### "Missing topic parameter" on /hub
+This is correct! It means Mercure is working. The endpoint expects SSE connections with a topic parameter.
+
+### Permission errors on var/
+```bash
+docker compose exec php chmod -R 777 var/
+```
+
+### OpenSearch not connecting
+Wait a few seconds after `docker compose up -d`. OpenSearch takes time to initialize.
+
+---
+
+## 📚 Resources
+
+- [Pimcore Studio Documentation](https://pimcore.com/docs/platform/Pimcore/Pimcore_Studio)
+- [Generic Data Index](https://pimcore.com/docs/platform/Generic_Data_Index)
+- [Generic Execution Engine](https://pimcore.com/docs/platform/Generic_Execution_Engine)
+- [Mercure](https://mercure.rocks)
+
+---
+
+## 🎬 Video Tutorial
+
+📺 Step-by-step video tutorial: **[Coming Soon]**
+
+---
+
+## 📄 License
+
+GPL-3.0 License – same as Pimcore.
+
+---
+
+## 👤 Author
+
+**Aleph Lau**
+
+- YouTube: [Coming Soon]
+- Blog: [Coming Soon]
