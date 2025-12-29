@@ -17,6 +17,7 @@
     "php": "~8.3.0 || ~8.4.0",
     "phpdocumentor/reflection-docblock": "^5.6",
     "pimcore/admin-ui-classic-bundle": "*",
+    "pimcore/generic-data-index-bundle": "^2.3",
     "pimcore/pimcore": "^12.3",
     "pimcore/platform-version": "2025.4",
     "pimcore/quill-bundle": "*",

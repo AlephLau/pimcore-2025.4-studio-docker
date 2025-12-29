@@ -137,3 +137,17 @@ framework:
 #         name: ''
 #         email: ''
 
+# Configuring an OpenSearch client
+pimcore_open_search_client:
+    clients:
+        default:
+            hosts: ['http://opensearch:9200']
+            password: 'admin'
+            username: 'admin'
+            ssl_verification: false
+
+# Define the client to be used by your bundle
+pimcore_generic_data_index:
+    index_service:
+        client_params:
+            client_name: default

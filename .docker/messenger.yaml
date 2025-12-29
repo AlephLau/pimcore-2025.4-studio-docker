@@ -7,3 +7,5 @@ framework:
             pimcore_image_optimize: 'amqp://rabbitmq:5672/%2f/pimcore_image_optimize'
             pimcore_asset_update: 'amqp://rabbitmq:5672/%2f/pimcore_asset_update'
             pimcore_generic_execution_engine: 'amqp://rabbitmq:5672/%2f/pimcore_generic_execution_engine'
+            pimcore_generic_data_index_queue: 'amqp://guest:guest@rabbitmq:5672/%2f/pimcore_generic_data_index_queue'
+            scheduler_generic_data_index: 'amqp://guest:guest@rabbitmq:5672/%2f/scheduler_generic_data_index'
