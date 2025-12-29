@@ -1,6 +1,6 @@
 # remove the following ignores for your project
 /config/pimcore/constants.php
-
+/cache
 # symfony default
 /.web-server-pid
 /config/pimcore/parameters.yml

@@ -7,6 +7,7 @@
     "sort-packages": true,
     "process-timeout": 0,
     "allow-plugins": {
+      "php-http/discovery": true,
       "symfony/runtime": true
     }
   },
@@ -14,9 +15,9 @@
   "minimum-stability": "dev",
   "require": {
     "php": "~8.3.0 || ~8.4.0",
+    "pimcore/admin-ui-classic-bundle": "*",
     "pimcore/pimcore": "^12.3",
     "pimcore/platform-version": "2025.4",
-    "pimcore/admin-ui-classic-bundle": "*",
     "pimcore/quill-bundle": "*",
     "symfony/amqp-messenger": "^6.2 || ^7.2",
     "symfony/dotenv": "^6.2 || ^7.2",
