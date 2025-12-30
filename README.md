@@ -182,5 +182,5 @@ Pimcore 2025.x uses [POCL (Pimcore Open Core License)](https://pimcore.com/en/re
 
 **Aleph Lau**
 
-- YouTube: [Coming Soon]
+- YouTube: [[Video](https://youtu.be/fckkom4Iiis)]
 - Blog: [Coming Soon]
