@@ -106,7 +106,7 @@ services:
             MERCURE_SUBSCRIBER_JWT_KEY: 'my-super-secret-jwt-key-min-32-chars!'
             MERCURE_EXTRA_DIRECTIVES: |-
                 anonymous
-                cors_origins "http://localhost"
+                cors_origins "http://localhost:8000"
         expose:
             - "80"
         volumes:

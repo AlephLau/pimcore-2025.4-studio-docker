@@ -155,5 +155,5 @@ pimcore_generic_data_index:
 pimcore_studio_backend:
     mercure_settings:
         jwt_key: 'my-super-secret-jwt-key-min-32-chars!'
-        hub_url_client: 'http://localhost/hub'
+        hub_url_client: 'http://localhost:8000/hub'
         hub_url_server: 'http://mercure/.well-known/mercure'
